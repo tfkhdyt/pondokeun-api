@@ -3,20 +3,21 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateLinkDto } from './dto/create-link.dto';
 import { UpdateLinkDto } from './dto/update-link.dto';
 import type { Link } from './entities/link.entity';
 
 @Injectable()
 export class LinksService {
-  private readonly links: Link[] = [];
+  constructor(private prisma: PrismaService) {}
 
-  create(createLinkDto: CreateLinkDto) {
+  async create(createLinkDto: CreateLinkDto) {
     const id = crypto.randomUUID();
     const date = new Date().toISOString();
     const slug = createLinkDto.slug ?? crypto.randomUUID().slice(0, 6);
 
-    this.verifySlug(slug);
+    await this.verifySlug(slug);
 
     const newLink: Link = {
       id,
@@ -26,7 +27,7 @@ export class LinksService {
       updatedDate: date,
     };
 
-    this.links.push(newLink);
+    await this.prisma.link.create({ data: newLink });
 
     return {
       status: 'success',
@@ -34,16 +35,22 @@ export class LinksService {
     };
   }
 
-  findAll() {
-    return this.links;
+  async findAll() {
+    return await this.prisma.link.findMany();
   }
 
-  findOne(id: string) {
-    const index = this.links.findIndex((link) => link.id === id);
-    if (index === -1) {
+  async findOne(id: string) {
+    const data = await this.prisma.link.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!data) {
       throw new NotFoundException('Link not found');
     }
-    return this.links[index];
+
+    return data;
   }
 
   update(id: number, updateLinkDto: UpdateLinkDto) {
@@ -54,8 +61,8 @@ export class LinksService {
     return `This action removes a #${id} link`;
   }
 
-  verifySlug(slug: string) {
-    const data = this.links.find((link) => link.slug === slug);
+  async verifySlug(slug: string) {
+    const data = await this.prisma.link.findUnique({ where: { slug } });
 
     if (data) {
       throw new BadRequestException('Slug already in use');
