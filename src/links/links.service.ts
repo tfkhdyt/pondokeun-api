@@ -62,8 +62,16 @@ export class LinksService {
     return data;
   }
 
-  update(id: number, updateLinkDto: UpdateLinkDto) {
-    return `This action updates a #${id} link`;
+  async update(id: string, updateLinkDto: UpdateLinkDto) {
+    const link = this.prisma.link.update({
+      where: { id },
+      data: {
+        ...updateLinkDto,
+        updatedDate: new Date().toISOString(),
+      },
+    });
+
+    return link;
   }
 
   remove(id: number) {
