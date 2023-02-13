@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateLinkDto } from './dto/create-link.dto';
 import { UpdateLinkDto } from './dto/update-link.dto';
 import type { Link } from './entities/link.entity';
@@ -11,6 +11,9 @@ export class LinksService {
     const id = crypto.randomUUID();
     const date = new Date().toISOString();
     const slug = createLinkDto.slug ?? crypto.randomUUID().slice(0, 6);
+
+    this.verifySlug(slug);
+
     const newLink: Link = {
       id,
       link: createLinkDto.link,
@@ -41,5 +44,13 @@ export class LinksService {
 
   remove(id: number) {
     return `This action removes a #${id} link`;
+  }
+
+  verifySlug(slug: string) {
+    const data = this.links.find((link) => link.slug === slug);
+
+    if (data) {
+      throw new BadRequestException('Slug already in use');
+    }
   }
 }
