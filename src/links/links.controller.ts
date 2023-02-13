@@ -20,8 +20,9 @@ export class LinksController {
   @Post()
   @UsePipes(new ZodValidationPipe(createLinkSchema))
   async create(@Body() createLinkDto: CreateLinkDto) {
-    const slug = createLinkDto.slug ?? crypto.randomUUID().slice(0, 6);
-    await this.linksService.verifySlug(slug);
+    if (createLinkDto.slug) {
+      await this.linksService.verifySlug(createLinkDto.slug);
+    }
 
     const link = await this.linksService.create(createLinkDto);
 
