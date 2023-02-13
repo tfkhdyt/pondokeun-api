@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateLinkDto } from './dto/create-link.dto';
 import { UpdateLinkDto } from './dto/update-link.dto';
 import type { Link } from './entities/link.entity';
@@ -34,8 +38,12 @@ export class LinksService {
     return this.links;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} link`;
+  findOne(id: string) {
+    const index = this.links.findIndex((link) => link.id === id);
+    if (index === -1) {
+      throw new NotFoundException('Link not found');
+    }
+    return this.links[index];
   }
 
   update(id: number, updateLinkDto: UpdateLinkDto) {

@@ -30,7 +30,7 @@ export class LinksController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.linksService.findOne(+id);
+    return this.linksService.findOne(id);
   }
 
   @Patch(':id')
