@@ -63,7 +63,14 @@ export class LinksController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.linksService.remove(+id);
+  async remove(@Param('id') id: string) {
+    await this.linksService.findOne(id);
+    const deletedLink = await this.linksService.remove(id);
+
+    return {
+      status: 'success',
+      message: 'Link deleted successfully',
+      deletedLink,
+    };
   }
 }

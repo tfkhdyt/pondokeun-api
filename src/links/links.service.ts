@@ -74,8 +74,12 @@ export class LinksService {
     return link;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} link`;
+  async remove(id: string) {
+    return await this.prisma.link.delete({
+      where: {
+        id,
+      },
+    });
   }
 
   async verifySlug(slug: string) {
