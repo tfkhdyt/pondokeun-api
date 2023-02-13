@@ -1,4 +1,6 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateLinkDto } from './create-link.dto';
+import { z } from 'zod';
+import { createLinkSchema } from './create-link.dto';
 
-export class UpdateLinkDto extends PartialType(CreateLinkDto) {}
+export const updateLinkSchema = createLinkSchema;
+
+export type UpdateLinkDto = z.infer<typeof updateLinkSchema>;

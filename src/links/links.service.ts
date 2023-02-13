@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateLinkDto } from './dto/create-link.dto';
 import { UpdateLinkDto } from './dto/update-link.dto';
-import { Link } from './entities/link.entity';
+import type { Link } from './entities/link.entity';
 
 @Injectable()
 export class LinksService {
@@ -23,7 +23,7 @@ export class LinksService {
 
     return {
       status: 'success',
-      createdLink: newLink,
+      shortenedLink: newLink,
     };
   }
 
