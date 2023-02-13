@@ -12,7 +12,6 @@ export class AppController {
 
   @Get(':slug')
   async redirect(@Res() res: Response, @Param('slug') slug: string) {
-    await this.linksService.verifySlug(slug);
     const link = await this.linksService.findOneBySlug(slug);
 
     res.status(302).redirect(link.link);
