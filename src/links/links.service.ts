@@ -17,8 +17,6 @@ export class LinksService {
     const date = new Date().toISOString();
     const slug = createLinkDto.slug ?? crypto.randomUUID().slice(0, 6);
 
-    await this.verifySlug(slug);
-
     const newLink: Link = {
       id,
       link: createLinkDto.link,
@@ -29,10 +27,7 @@ export class LinksService {
 
     await this.prisma.link.create({ data: newLink });
 
-    return {
-      status: 'success',
-      shortenedLink: newLink,
-    };
+    return newLink;
   }
 
   async findAll() {
@@ -43,6 +38,20 @@ export class LinksService {
     const data = await this.prisma.link.findUnique({
       where: {
         id,
+      },
+    });
+
+    if (!data) {
+      throw new NotFoundException('Link not found');
+    }
+
+    return data;
+  }
+
+  async findOneBySlug(slug: string) {
+    const data = await this.prisma.link.findUnique({
+      where: {
+        slug,
       },
     });
 

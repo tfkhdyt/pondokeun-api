@@ -1,12 +1,20 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param, Res } from '@nestjs/common';
+import { Response } from 'express';
 import { AppService } from './app.service';
+import { LinksService } from './links/links.service';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    private readonly appService: AppService,
+    private readonly linksService: LinksService,
+  ) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  @Get(':slug')
+  async redirect(@Res() res: Response, @Param('slug') slug: string) {
+    await this.linksService.verifySlug(slug);
+    const link = await this.linksService.findOneBySlug(slug);
+
+    res.status(302).redirect(link.link);
   }
 }

@@ -19,18 +19,36 @@ export class LinksController {
 
   @Post()
   @UsePipes(new ZodValidationPipe(createLinkSchema))
-  create(@Body() createLinkDto: CreateLinkDto) {
-    return this.linksService.create(createLinkDto);
+  async create(@Body() createLinkDto: CreateLinkDto) {
+    const slug = createLinkDto.slug ?? crypto.randomUUID().slice(0, 6);
+    await this.linksService.verifySlug(slug);
+
+    const link = await this.linksService.create(createLinkDto);
+
+    return {
+      status: 'success',
+      shortenedLink: link,
+    };
   }
 
   @Get()
-  findAll() {
-    return this.linksService.findAll();
+  async findAll() {
+    const data = await this.linksService.findAll();
+
+    return {
+      status: 'success',
+      data,
+    };
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.linksService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    const data = await this.linksService.findOne(id);
+
+    return {
+      status: 'success',
+      data,
+    };
   }
 
   @Patch(':id')
